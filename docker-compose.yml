@@ -14,8 +14,6 @@ services:
       - ${PWD}/certs:${PWD}/certs
       - ${PWD}/wwwlogs:${PWD}/wwwlogs
       - ${PWD}/wwwroot:${PWD}/wwwroot
-      # Also 别忘了PHP-FPM的Sock
-      - /tmp/php:/tmp/php
     environment:
       - CUR_WORK_DIR=${PWD}
 
@@ -25,8 +23,6 @@ services:
     image: neilpang/acme.sh
     container_name: git-proxy-acmesh
     command: daemon
-    environment:
-      - TZ=${TZ}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${PWD}/certs:/acme.sh
