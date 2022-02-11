@@ -2,14 +2,6 @@ https://hub.fastgit.org {
 	encode gzip zstd
 	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
 
-	# 不响应根目录请求
-	# 防止探测,当然这个只是给自用的时候用
-	handle / {
-		respond * "Nope" 403 {
-			close
-		}
-	}
-
 	# 禁止搜索引擎
 	handle /robots.txt {
 		root /robots.txt {$CUR_WORK_DIR}/wwwroot
@@ -18,12 +10,11 @@ https://hub.fastgit.org {
 
 	# releases 下载
 	@releases {
-		path_regexp ^/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/releases/download/.*$
+		path_regexp ^/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/releases/download
 	}
 	handle @releases {
 		redir * https://download.fastgit.org{uri} permanent
 	}
-	# redir @releases https://download.fastgit.org{uri} permanent
 
 	# archive 下载
 	@archive {
@@ -41,18 +32,20 @@ https://hub.fastgit.org {
 		redir https://download.fastgit.org{uri} permanent
 	}
 
+	import block-root-dir
+
 	# 最后一个请求直接送去 GitHub
-	handle /* {
+	handle * {
 		reverse_proxy * https://github.com {
 			# 设定两个请求头
 			header_up Host "github.com"
 			header_up Accept-Encoding ""
-			# 对 GitHub 隐藏请求头
-			header_up -referrer-policy
-			header_up -content-security-policy
-			header_up -Strict-Transport-Security
-			header_up -set-cookie
-			header_up -x-pjax-url
+			# 回传时隐藏头
+			header_down -referrer-policy
+			header_down -content-security-policy
+			header_down -Strict-Transport-Security
+			header_down -set-cookie
+			header_down -x-pjax-url
 			@normal {
 				status 200
 			}
@@ -63,11 +56,5 @@ https://hub.fastgit.org {
 		}
 	}
 
-	log {
-		output file {$CUR_WORK_DIR}/wwwlogs/hub.fastgit.org.log {
-			roll_size 50mb
-			roll_keep 3
-			roll_keep_for 48h
-		}
-	}
+	import site-log hub.fastgit.org
 }

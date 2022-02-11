@@ -2,22 +2,8 @@ https://download.fastgit.org {
 	encode gzip zstd
 	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
 
-	# 不响应根目录请求
-	handle / {
-		respond * "" 403 {
-			close
-		}
-	}
-
-	# 禁止搜索引擎
-	@bot {
-		header_regexp User-Agent "qihoobot|Baiduspider|Bingbot|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot"
-	}
-	handle @bot {
-		respond * "" 403 {
-			close
-		}
-	}
+	# 拦截搜索引擎
+	import block-search-engine-by-ua
 
 	# 针对 release 的下载
 	# 因为这就是 download 子域,所以直接反代
@@ -55,12 +41,7 @@ https://download.fastgit.org {
 	}
 
 	# TODO: 处理重定向部分
-
-	log {
-		output file {$CUR_WORK_DIR}/wwwlogs/download.fastgit.org.log {
-			roll_size 50mb
-			roll_keep 3
-			roll_keep_for 48h
-		}
-	}
+	
+	import block-root-dir
+	import site-log download.fastgit.org
 }
