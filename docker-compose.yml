@@ -10,6 +10,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${PWD}/caddy:/etc/caddy
+      # 其实这个在生产环境可以关掉,没必要
       - ${PWD}/caddy/autosave.json:/config/caddy/autosave.json
       - ${PWD}/certs:${PWD}/certs
       - ${PWD}/wwwlogs:${PWD}/wwwlogs
