@@ -16,6 +16,12 @@ https://download.fastgit.org {
 			handle_response {
 			}
 		}
+		filter {
+			search_pattern objects.githubusercontent.com
+			replacement raw.fastgit.org
+			# Only process content_type matching this regex
+			content_type .*text/html.*
+		}
 	}
 
 	# 针对 suites 的下载
@@ -28,6 +34,12 @@ https://download.fastgit.org {
 			header_up Host "github.com"
 			handle_response {
 			}
+		}
+		filter {
+			search_pattern objects.githubusercontent.com
+			replacement raw.fastgit.org
+			# Only process content_type matching this regex
+			content_type .*text/html.*
 		}
 	}
 

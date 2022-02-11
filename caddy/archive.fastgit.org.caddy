@@ -35,6 +35,12 @@ https://archive.fastgit.org {
 			handle_response {
 			}
 		}
+		filter {
+			search_pattern objects.githubusercontent.com
+			replacement raw.fastgit.org
+			# Only process content_type matching this regex
+			content_type .*text/html.*
+		}
 	}
 
 	# TODO: 处理重定向部分

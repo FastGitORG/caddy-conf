@@ -1,0 +1,34 @@
+https://raw.fastgit.org {
+	encode gzip zstd
+	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
+
+	# 拦截搜索引擎
+	import block-search-engine-by-ua
+
+	# 针对 release 的下载
+	# 因为这就是 download 子域,所以直接反代
+	@raw {
+		header Referrer *.fastgit.org
+		header Referrer raw.githubusercontent.com
+		header Referrer github.com
+		header Referrer objects.githubusercontent.com
+	}
+	handle @raw {
+		reverse_proxy * https://raw.githubusercontent.com {
+			# 设定两个请求头
+			header_up Host "raw.githubusercontent.com"
+			header_up Accept-Encoding ""
+			# 回传时隐藏头
+			header_down -referrer-policy
+			header_down -content-security-policy
+			header_down -Strict-Transport-Security
+			header_down -set-cookie
+			header_down -x-pjax-url
+			handle_response {
+			}
+		}
+	}
+
+	import block-root-dir
+	import site-log download.fastgit.org
+}
