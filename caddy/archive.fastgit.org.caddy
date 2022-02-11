@@ -1,0 +1,63 @@
+https://archive.fastgit.org {
+	encode gzip zstd
+	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
+
+	# 禁止搜索引擎
+	@bot {
+        header_regexp User-Agent "qihoobot|Baiduspider|Bingbot|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot"
+    }
+	route @bot {
+		respond * "" 403 {
+			close
+		}
+	}
+
+	# 针对 release 的下载
+	# 这里是 archive 子域,所以重定向到 download 子域
+    @archive_releases {
+        path_regexp ^/[^/]+/[^/]+/releases(/latest)?/download/
+    }
+	# 所以我们送去到 download 子域
+    route @archive_releases {
+         redir https://download.fastgit.org{uri} permanent
+    }
+
+    # 针对 suites 的下载
+	# 处理方式同上
+    @archive_suites {
+        path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
+    }
+    route @archive_suites {
+        redir https://download.fastgit.org{uri} permanent
+    }
+
+    # 针对 archive 的下载
+	# 这便是 archive 子域应该做的事情了
+    @archive_download {
+        path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
+    }
+    route @archive_download {
+        reverse_proxy * https://github.com {
+			header_up Host "github.com"
+			handle_response {
+			}
+		}
+    }
+
+	# TODO: 处理重定向部分
+
+	# 不响应根目录请求
+	route / {
+		respond * "" 403 {
+			close
+		}
+	}
+
+	log {
+		output file {$CUR_WORK_DIR}/wwwlogs/archive.fastgit.org.log {
+			roll_size 50mb
+			roll_keep 3
+			roll_keep_for 48h
+		}
+	}
+}

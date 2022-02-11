@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  git-proxy-caddy:
+    restart: always
+    container_name: git-proxy-caddy
+    image: caddy
+    ports:
+      - 443:443
+      - 443:443/udp
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${PWD}/caddy:/etc/caddy
+      - ${PWD}/caddy/autosave.json:/config/caddy/autosave.json
+      - ${PWD}/certs:${PWD}/certs
+      - ${PWD}/wwwlogs:${PWD}/wwwlogs
+      - ${PWD}/wwwroot:${PWD}/wwwroot
+      # Also 别忘了PHP-FPM的Sock
+      - /tmp/php:/tmp/php
+    environment:
+      - CUR_WORK_DIR=${PWD}
+
+
+  git-proxy-acmesh:
+    restart: always
+    image: neilpang/acme.sh
+    container_name: git-proxy-acmesh
+    command: daemon
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${PWD}/certs:/acme.sh
