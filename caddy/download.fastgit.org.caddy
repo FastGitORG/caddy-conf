@@ -12,14 +12,14 @@ https://download.fastgit.org {
 	}
 	handle @download_releases {
 		reverse_proxy * https://github.com {
+			# 设定两个请求头
 			header_up Host "github.com"
-			handle_response {
-			}
+			header_up Accept-Encoding ""
+			header_down Location objects.githubusercontent.com raw.fastgit.org
 		}
 		filter {
 			search_pattern objects.githubusercontent.com
 			replacement raw.fastgit.org
-			# Only process content_type matching this regex
 			content_type .*text/html.*
 		}
 	}
@@ -31,14 +31,14 @@ https://download.fastgit.org {
 	}
 	handle @download_suites {
 		reverse_proxy * https://github.com {
+			# 设定两个请求头
 			header_up Host "github.com"
-			handle_response {
-			}
+			header_up Accept-Encoding ""
+			header_down Location objects.githubusercontent.com raw.fastgit.org
 		}
 		filter {
 			search_pattern objects.githubusercontent.com
 			replacement raw.fastgit.org
-			# Only process content_type matching this regex
 			content_type .*text/html.*
 		}
 	}

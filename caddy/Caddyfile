@@ -1,3 +1,6 @@
+{
+	order filter after encode
+}
 # 先加载片段
 import snippets.caddy
 import hub.fastgit.org.caddy

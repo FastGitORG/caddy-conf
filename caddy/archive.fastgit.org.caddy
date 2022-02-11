@@ -31,9 +31,9 @@ https://archive.fastgit.org {
 	}
 	handle @archive_download {
 		reverse_proxy * https://github.com {
+			# 设定两个请求头
 			header_up Host "github.com"
-			handle_response {
-			}
+			header_up Accept-Encoding ""
 		}
 		filter {
 			search_pattern objects.githubusercontent.com
