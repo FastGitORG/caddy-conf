@@ -2,38 +2,47 @@ https://hub.fastgit.org {
 	encode gzip zstd
 	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
 
+	# 不响应根目录请求
+	# 防止探测,当然这个只是给自用的时候用
+	handle / {
+		respond * "Nope" 403 {
+			close
+		}
+	}
+
 	# 禁止搜索引擎
-	route /robots.txt {
+	handle /robots.txt {
 		root /robots.txt {$CUR_WORK_DIR}/wwwroot
 		file_server
 	}
 
 	# releases 下载
 	@releases {
-		path_regexp ^/[^/]+/[^/]+/releases/download/
+		path_regexp ^/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/releases/download/.*$
 	}
-	route @releases {
-		redir https://download.fastgit.org{uri} permanent
+	handle @releases {
+		redir * https://download.fastgit.org{uri} permanent
 	}
+	# redir @releases https://download.fastgit.org{uri} permanent
 
 	# archive 下载
 	@archive {
 		path_regexp ^/[^/]+/[^/]+/archive/
 	}
-	route @archive {
-		redir https://archive.fastgit.org{uri} permanent
+	handle @archive {
+		redir * https://archive.fastgit.org{uri} permanent
 	}
 
 	# suites 下载
 	@suites {
 		path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
 	}
-	route @suites {
+	handle @suites {
 		redir https://download.fastgit.org{uri} permanent
 	}
 
 	# 最后一个请求直接送去 GitHub
-	route /* {
+	handle /* {
 		reverse_proxy * https://github.com {
 			# 设定两个请求头
 			header_up Host "github.com"
@@ -44,17 +53,13 @@ https://hub.fastgit.org {
 			header_up -Strict-Transport-Security
 			header_up -set-cookie
 			header_up -x-pjax-url
-			handle_response {
-				# TODO: 需要了解一下如何处理响应
+			@normal {
+				status 200
 			}
-		}
-	}
-
-	# 不响应根目录请求
-	# 防止探测,当然这个只是给自用的时候用
-	route / {
-		respond * "Nope" 403 {
-			close
+			handle_response @normal {
+				# TODO: 需要了解一下如何处理响应
+				rewrite * https://download.fastgit.org/
+			}
 		}
 	}
 

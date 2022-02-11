@@ -2,11 +2,18 @@ https://archive.fastgit.org {
 	encode gzip zstd
 	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
 
+	# 不响应根目录请求
+	handle / {
+		respond * "" 403 {
+			close
+		}
+	}
+
 	# 禁止搜索引擎
 	@bot {
 		header_regexp User-Agent "qihoobot|Baiduspider|Bingbot|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot"
 	}
-	route @bot {
+	handle @bot {
 		respond * "" 403 {
 			close
 		}
@@ -18,7 +25,7 @@ https://archive.fastgit.org {
 		path_regexp ^/[^/]+/[^/]+/releases(/latest)?/download/
 	}
 	# 所以我们送去到 download 子域
-	route @archive_releases {
+	handle @archive_releases {
 		redir https://download.fastgit.org{uri} permanent
 	}
 
@@ -27,7 +34,7 @@ https://archive.fastgit.org {
 	@archive_suites {
 		path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
 	}
-	route @archive_suites {
+	handle @archive_suites {
 		redir https://download.fastgit.org{uri} permanent
 	}
 
@@ -36,7 +43,7 @@ https://archive.fastgit.org {
 	@archive_download {
 		path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
 	}
-	route @archive_download {
+	handle @archive_download {
 		reverse_proxy * https://github.com {
 			header_up Host "github.com"
 			handle_response {
@@ -46,12 +53,6 @@ https://archive.fastgit.org {
 
 	# TODO: 处理重定向部分
 
-	# 不响应根目录请求
-	route / {
-		respond * "" 403 {
-			close
-		}
-	}
 
 	log {
 		output file {$CUR_WORK_DIR}/wwwlogs/archive.fastgit.org.log {
