@@ -10,7 +10,7 @@ https://hub.fastgit.org {
 
 	# releases 下载
 	@releases {
-		path_regexp ^/([a-zA-Z0-9_-]+)/([a-zA-Z0-9_-]+)/releases/download
+		path_regexp ^/[^/]+/[^/]+/releases/download
 	}
 	handle @releases {
 		redir * https://download.fastgit.org{uri} permanent
@@ -39,7 +39,6 @@ https://hub.fastgit.org {
 		reverse_proxy * https://github.com {
 			# 设定两个请求头
 			header_up Host "github.com"
-			header_up Accept-Encoding ""
 			# 回传时隐藏头
 			header_down -referrer-policy
 			header_down -content-security-policy

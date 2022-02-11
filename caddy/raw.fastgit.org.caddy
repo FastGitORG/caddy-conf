@@ -8,24 +8,15 @@ https://raw.fastgit.org {
 	# 针对 release 的下载
 	# 因为这就是 download 子域,所以直接反代
 	@raw {
-		header Referrer *.fastgit.org
-		header Referrer raw.githubusercontent.com
-		header Referrer github.com
-		header Referrer objects.githubusercontent.com
+		# header Referrer *.fastgit.org
+		# header Referrer raw.githubusercontent.com
+		# header Referrer github.com
+		# header Referrer objects.githubusercontent.com
 	}
-	handle @raw {
+	handle * {
 		reverse_proxy * https://raw.githubusercontent.com {
 			# 设定两个请求头
 			header_up Host "raw.githubusercontent.com"
-			header_up Accept-Encoding ""
-			# 回传时隐藏头
-			header_down -referrer-policy
-			header_down -content-security-policy
-			header_down -Strict-Transport-Security
-			header_down -set-cookie
-			header_down -x-pjax-url
-			handle_response {
-			}
 		}
 	}
 
