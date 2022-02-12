@@ -15,7 +15,7 @@ https://download.fastgit.org {
 			# 设定两个请求头
 			header_up Host "github.com"
 			header_up Accept-Encoding ""
-			header_down Location githubusercontent.com fastgit.org:{hostport}
+			header_down Location githubusercontent.com fastgit.org:{port}
 			@redirect {
 				status 301 302 307
 			}
@@ -25,7 +25,7 @@ https://download.fastgit.org {
 		}
 		filter {
 			search_pattern githubusercontent.com
-			replacement fastgit.org:{hostport}
+			replacement fastgit.org:{port}
 			content_type .*text/html.*
 		}
 	}
@@ -39,13 +39,13 @@ https://download.fastgit.org {
 			# 设定两个请求头
 			header_up Host "github.com"
 			header_up Accept-Encoding ""
-			header_down Location githubusercontent.com fastgit.org:{hostport}
+			header_down Location githubusercontent.com fastgit.org:{port}
 			# 回传时隐藏头
 			import proxy-hide-headers
 		}
 		filter {
 			search_pattern githubusercontent.com
-			replacement fastgit.org:{hostport}
+			replacement fastgit.org:{port}
 			content_type .*text/html.*
 		}
 	}
@@ -55,7 +55,7 @@ https://download.fastgit.org {
 		path_regexp ^/[^/]+/[^/]+/archive/
 	}
 	handle @download_archive {
-		redir https://download.fastgit.org:{hostport}{uri} permanent
+		redir https://download.fastgit.org:{port}{uri} permanent
 	}
 
 	# TODO: 处理重定向部分

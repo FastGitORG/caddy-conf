@@ -38,7 +38,7 @@ https://archive.fastgit.org {
 		}
 		filter {
 			search_pattern codeload.github.com
-			replacement codeload.fastgit.org:{hostport}
+			replacement codeload.fastgit.org:{port}
 			content_type .*text/html.*
 		}
 	}
