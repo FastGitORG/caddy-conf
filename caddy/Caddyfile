@@ -3,7 +3,9 @@
 }
 # 先加载片段
 import snippets.caddy
-import hub.fastgit.org.caddy
-import download.fastgit.org.caddy
-import archive.fastgit.org.caddy
-import raw.fastgit.org.caddy
+import hub.caddy
+# 预备在未来进行合并
+import download.caddy
+import archive.caddy
+# import raw.fastgit.org.caddy
+import usercontent.caddy
