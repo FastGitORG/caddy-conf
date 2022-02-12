@@ -1,5 +1,6 @@
 {
 	order filter after encode
+	debug
 }
 # 先加载片段
 import snippets.caddy
