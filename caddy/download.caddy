@@ -1,5 +1,5 @@
 # 此处已经合并了两种下载类型
-https://download.fastgit.org, https://archive.fastgit.org {
+https://download.fastgit.org {
 	encode gzip zstd
 	tls {$CUR_WORK_DIR}/certs/fastgit.org/fullchain.cer {$CUR_WORK_DIR}/certs/fastgit.org/fastgit.org.key
 
@@ -8,7 +8,6 @@ https://download.fastgit.org, https://archive.fastgit.org {
 
 	# 针对 release 的下载
 	@download_releases {
-		host download.fastgit.org
 		path_regexp ^/[^/]+/[^/]+/releases(/latest)?/download/
 	}
 	handle @download_releases {
@@ -16,18 +15,23 @@ https://download.fastgit.org, https://archive.fastgit.org {
 			# 设定两个请求头
 			header_up Host "github.com"
 			header_up Accept-Encoding ""
-			header_down Location githubusercontent.com fastgit.org
+			header_down Location githubusercontent.com fastgit.org:{hostport}
+			@redirect {
+				status 301 302 307
+			}
+			handle_response @redirect {
+				rewrite * https://download.fastgit.org/
+			}
 		}
 		filter {
 			search_pattern githubusercontent.com
-			replacement fastgit.org
+			replacement fastgit.org:{hostport}
 			content_type .*text/html.*
 		}
 	}
 
 	# 针对 suites 的下载
 	@download_suites {
-		host download.fastgit.org
 		path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
 	}
 	handle @download_suites {
@@ -35,36 +39,23 @@ https://download.fastgit.org, https://archive.fastgit.org {
 			# 设定两个请求头
 			header_up Host "github.com"
 			header_up Accept-Encoding ""
-			header_down Location githubusercontent.com fastgit.org
+			header_down Location githubusercontent.com fastgit.org:{hostport}
 			# 回传时隐藏头
 			import proxy-hide-headers
 		}
 		filter {
 			search_pattern githubusercontent.com
-			replacement fastgit.org
+			replacement fastgit.org:{hostport}
 			content_type .*text/html.*
 		}
 	}
 
 	# 针对 archive 的下载
 	@download_archive {
-		host archive.fastgit.org
 		path_regexp ^/[^/]+/[^/]+/archive/
 	}
 	handle @download_archive {
-		# redir https://download.fastgit.org{uri} permanent
-		reverse_proxy * https://github.com {
-			# 设定两个请求头
-			header_up Host "github.com"
-			header_up Accept-Encoding ""
-			# 回传时隐藏头
-			import proxy-hide-headers
-		}
-		filter {
-			search_pattern githubusercontent.com
-			replacement fastgit.org
-			content_type .*text/html.*
-		}
+		redir https://download.fastgit.org:{hostport}{uri} permanent
 	}
 
 	# TODO: 处理重定向部分

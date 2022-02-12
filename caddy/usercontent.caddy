@@ -35,5 +35,5 @@ https://raw.fastgit.org, https://objects.fastgit.org {
 	}
 
 	import block-root-dir
-	import site-log download.fastgit.org
+	import site-log raw.fastgit.org
 }

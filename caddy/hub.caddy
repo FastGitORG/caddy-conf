@@ -13,7 +13,7 @@ https://hub.fastgit.org {
 		path_regexp ^/[^/]+/[^/]+/releases/download
 	}
 	handle @releases {
-		redir * https://download.fastgit.org{uri} permanent
+		redir * https://download.fastgit.org:{hostport}{uri} permanent
 	}
 
 	# archive 下载
@@ -21,7 +21,7 @@ https://hub.fastgit.org {
 		path_regexp ^/[^/]+/[^/]+/archive/
 	}
 	handle @archive {
-		redir * https://archive.fastgit.org{uri} permanent
+		redir * https://archive.fastgit.org:{hostport}{uri} permanent
 	}
 
 	# suites 下载
@@ -29,7 +29,7 @@ https://hub.fastgit.org {
 		path_regexp ^/[^/]+/[^/]+/suites/[^/]+/artifacts/
 	}
 	handle @suites {
-		redir https://download.fastgit.org{uri} permanent
+		redir https://download.fastgit.org:{hostport}{uri} permanent
 	}
 
 	import block-root-dir
