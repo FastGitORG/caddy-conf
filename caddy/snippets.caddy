@@ -30,3 +30,12 @@
 		}
 	}
 }
+
+# 反代的时候隐藏回传头
+(proxy-hide-headers) {
+	header_down -referrer-policy
+	header_down -content-security-policy
+	header_down -Strict-Transport-Security
+	header_down -set-cookie
+	header_down -x-pjax-url
+}

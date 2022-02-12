@@ -5,7 +5,8 @@
 import snippets.caddy
 import hub.caddy
 # 预备在未来进行合并
+# 现在 archive 已经合并到 download 中
 import download.caddy
-import archive.caddy
+# import archive.caddy
 # import raw.fastgit.org.caddy
 import usercontent.caddy

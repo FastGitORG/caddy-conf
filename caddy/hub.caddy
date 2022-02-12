@@ -40,11 +40,7 @@ https://hub.fastgit.org {
 			# 设定两个请求头
 			header_up Host "github.com"
 			# 回传时隐藏头
-			header_down -referrer-policy
-			header_down -content-security-policy
-			header_down -Strict-Transport-Security
-			header_down -set-cookie
-			header_down -x-pjax-url
+			import proxy-hide-headers
 			# @normal {
 			# 	status 200
 			# }

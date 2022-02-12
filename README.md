@@ -12,8 +12,9 @@
 - [x] 拆分 raw 和 objects 两个反代
 - [x] 测试 Caddy 正则表达式路径匹配
 - [ ] 处理错误重定向
-- [ ] 优化 & 合并配置 (目前完成了部分片段替换)
-- [ ] 合并 download 和 archive 配置
+- [ ] 处理错误页面
+- [x] 优化 & 合并配置 (目前完成了部分片段替换)
+- [x] 合并 download 和 archive 配置
 
 由于 Caddy 中不存在 Nginx 的 `sub_filter` 模块，所以这里需要借助第三方插件
 
