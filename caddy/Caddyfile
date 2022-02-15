@@ -48,4 +48,46 @@
 	}
 }
 
+# 日志片段
+(site-log) {
+    log {
+		output file {$CUR_WORK_DIR}/wwwlogs/{args.0}.log {
+			roll_size 50mb
+			roll_keep 7
+			roll_keep_for 72h
+		}
+    }
+}
+
+# 禁止搜索引擎
+(block-search-engine-by-ua) {
+	@bot {
+		header_regexp User-Agent "qihoobot|Baiduspider|Bingbot|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot"
+	}
+	handle @bot {
+		respond * "" 403 {
+			close
+		}
+	}
+}
+
+# 禁止根目录
+(block-root-dir) {
+	# 不响应根目录请求
+	handle / {
+		respond * "" 403 {
+			close
+		}
+	}
+}
+
+# 反代的时候隐藏回传头
+(proxy-hide-headers) {
+	header_down -referrer-policy
+	header_down -content-security-policy
+	header_down -Strict-Transport-Security
+	header_down -set-cookie
+	header_down -x-pjax-url
+}
+
 import conf.d/*.conf
