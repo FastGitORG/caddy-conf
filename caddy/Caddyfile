@@ -1,13 +1,93 @@
 {
+	servers {
+		protocol {
+			allow_h2c
+			experimental_http3
+#			strict_sni_host
+		}
+	}
+	email mx365cent@gmail.com # email for Automagic TLS
+	# acme_ca https://acme.zerossl.com/v2/DV90
+	# cert_issuer zerossl {{ Place your api token here }}
 	order filter after encode
-	debug
 }
-# 先加载片段
-import snippets.caddy
-import hub.caddy
-# 预备在未来进行合并
-# 现在 archive 已经合并到 download 中
-import download.caddy
-# import archive.caddy
-# import raw.fastgit.org.caddy
-import usercontent.caddy
+(static) {
+	@static {
+		file
+		path *.ico *.css *.js *.gif *.jpg *.jpeg *.png *.svg *.woff *.json
+	}
+	header @static Cache-Control max-age=5184000
+}
+
+(security) {
+	header {
+		# disable FLoC tracking
+		Permissions-Policy interest-cohort=()
+		# enable HSTS
+		Strict-Transport-Security max-age=31536000;
+		# disable clients from sniffing the media type
+		X-Content-Type-Options nosniff
+		# keep referrer data off of HTTP connections
+		Referrer-Policy no-referrer-when-downgrade
+	}
+}
+
+(error) {
+	handle_errors {
+		respond "{http.error.status_code} {http.error.status_text}"
+	}
+}
+
+(http.cat) {
+	handle_errors {
+		rewrite * /{http.error.status_code}
+		reverse_proxy https://http.cat {
+			header_up Host http.cat
+			header_down -Server
+		}
+	}
+}
+
+# 日志片段
+(site-log) {
+    log {
+		output file {$CUR_WORK_DIR}/wwwlogs/{args.0}.log {
+			roll_size 50mb
+			roll_keep 7
+			roll_keep_for 72h
+		}
+    }
+}
+
+# 禁止搜索引擎
+(block-search-engine-by-ua) {
+	@bot {
+		header_regexp User-Agent "qihoobot|Baiduspider|Bingbot|Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|Adsbot-Google|Feedfetcher-Google|Yahoo! Slurp|Yahoo! Slurp China|YoudaoBot|Sosospider|Sogou spider|Sogou web spider|MSNBot|ia_archiver|Tomato Bot"
+	}
+	handle @bot {
+		respond * "" 403 {
+			close
+		}
+	}
+}
+
+# 禁止根目录
+(block-root-dir) {
+	# 不响应根目录请求
+	handle / {
+		respond * "" 403 {
+			close
+		}
+	}
+}
+
+# 反代的时候隐藏回传头
+(proxy-hide-headers) {
+	header_down -referrer-policy
+	header_down -content-security-policy
+	header_down -Strict-Transport-Security
+	header_down -set-cookie
+	header_down -x-pjax-url
+}
+
+import conf.d/*.conf
