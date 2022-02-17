@@ -6,7 +6,7 @@
 #			strict_sni_host
 		}
 	}
-	email mx365cent@gmail.com # email for Automagic TLS
+	email admin@fastgit.org # email for Automagic TLS
 	# acme_ca https://acme.zerossl.com/v2/DV90
 	# cert_issuer zerossl {{ Place your api token here }}
 	order filter after encode
