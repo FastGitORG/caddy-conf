@@ -1,2 +1,3 @@
 certs/
 caddy/autosave.json
+caddy-debug

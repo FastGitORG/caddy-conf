@@ -3,7 +3,7 @@ services:
   git-proxy-caddy:
     restart: always
     container_name: git-proxy-caddy
-    image: gzzchh/stacks:caddy
+    image: ghcr.io/fastgitorg/caddy:latest
     ports:
       - 443:443
       - 443:443/udp
